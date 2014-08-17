@@ -2,7 +2,8 @@
 
 ## Loading and preprocessing the data
 Loading data into a data frame 
-```{r loaddata}
+
+```r
 df <- read.csv( unz("activity.zip", "activity.csv"), 
                 header=T, sep=",", 
                 colClasses=c("integer","Date","integer"))
@@ -10,28 +11,45 @@ df <- read.csv( unz("activity.zip", "activity.csv"),
 
 ## What is mean total number of steps taken per day?
 Missing values for steps in the data set can be ignored and are therefore removed.
-```{r cleaning data}
+
+```r
 total_steps <- tapply( df$steps, df$date, sum, na.rm=TRUE )
 ```
 
 Making a histogram of the total number of steps taken each day
-```{r histogram}
+
+```r
 hist(total_steps, 
      main="Histogram of total number of steps taken each day",
      xlab="Total number of steps")
 ```
 
+![plot of chunk histogram](figure/histogram.png) 
+
 Calculating and reporting the mean and median of the total number of steps taken per day
-```{r mean and median }
+
+```r
 mean(total_steps)
+```
+
+```
+## [1] 9354
+```
+
+```r
 median(total_steps)
+```
+
+```
+## [1] 10395
 ```
 
 ## What is the average daily activity pattern?
 Making a time series plot of the 5-minute interval and the average number of steps taken, 
 averaged across all days
 
-```{r time series plot}
+
+```r
 library(ggplot2)
 average_steps <- aggregate(x=list(steps=df$steps), 
                       by=list(interval=df$interval),
@@ -44,20 +62,34 @@ ggplot(data=average_steps,
        ylab("The average number of steps taken")
 ```
 
+![plot of chunk time series plot](figure/time series plot.png) 
+
 Determining the 5-minute interval that on contains the maximum number of steps
-```{r max average steps}
+
+```r
 average_steps[which.max(average_steps$steps),]
+```
+
+```
+##     interval steps
+## 104      835 206.2
 ```
 
 
 ## Imputing missing values
 Calculating the total number of missing values in the dataset 
-```{r missing values}
+
+```r
 sum(is.na(df$steps))
+```
+
+```
+## [1] 2304
 ```
 Creating a new dataset that is equal to the original dataset but with the missing data filled in.
 (filling in all of the missing values in the dataset using the mean for that 5-minute interval)
-```{r imputing values}
+
+```r
 fill.value <- function(steps, interval) {
     filled <- NA
     if (!is.na(steps))
@@ -71,18 +103,33 @@ new_df$steps <- mapply(fill.value, filled.df$steps, filled.df$interval)
 ```
   
 Making a histogram of the total number of steps taken each day
-```{r new histogram}
+
+```r
 new_total_steps <- tapply( new_df$steps, new_df$date, sum, na.rm=TRUE )
 hist(new_total_steps, 
      main="Histogram of total number of steps taken each day using imputed values",
      xlab="Total number of steps")
 ```
 
+![plot of chunk new histogram](figure/new histogram.png) 
+
 Calculate and report the mean and median total number of steps taken per day
 using imputed values. 
-```{r new mean and median }
+
+```r
 mean(new_total_steps)
+```
+
+```
+## [1] 10766
+```
+
+```r
 median(new_total_steps)
+```
+
+```
+## [1] 10766
 ```
 
 The mean and the median values for the total daily number of steps are larger 
@@ -90,7 +137,8 @@ when missing values are imputed.
  
 
 ## Are there differences in activity patterns between weekdays and weekends?
-```{r weekday or weekend}
+
+```r
 # Change to English
   hide <- Sys.setlocale("LC_ALL", "English")
 
@@ -120,5 +168,6 @@ xyplot(steps ~ interval | day,
        ylab = "Number of steps",
        type = c("l")
        )
-
 ```
+
+![plot of chunk weekday or weekend](figure/weekday or weekend.png) 
